@@ -2,43 +2,29 @@ package jain.ankit.balconyview;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.ProgressDialog;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.widget.MediaController;
-import android.widget.Toast;
-import android.widget.VideoView;
+
+import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.ui.StyledPlayerView;
 
 public class MainActivity extends AppCompatActivity {
-    VideoView mVideoView;
-    MediaController mediaController;
+    StyledPlayerView exoPlayerView;
 
     String url= "rtsp://tplinkcam1:tplinkcam1@192.168.1.2/stream1";
-
+// credits: https://exoplayer.dev/hello-world.html
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mediaController = new MediaController(this);
-        mVideoView = findViewById(R.id.mVideoView);
+        exoPlayerView = findViewById(R.id.exoPlayerView);
 
-        mediaController.setAnchorView(mVideoView);
-
-        mVideoView.setVideoURI(Uri.parse(url));
-        mVideoView.setMediaController(mediaController);
-        mVideoView.start();
-
-        ProgressDialog progressDialog= ProgressDialog.show(this, "Loading", "Please wait...", true);
-
-        mVideoView.setOnPreparedListener(mediaPlayer -> progressDialog.dismiss());
-
-        mVideoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-            @Override
-            public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
-                Toast.makeText(getApplicationContext(), "Oops An Error Occurred While Playing Video...!!!", Toast.LENGTH_LONG).show(); // display a toast when an error is occured while playing an video
-                return false;
-            }
-        });
+        ExoPlayer exoPlayer = new ExoPlayer.Builder(this).build();
+        exoPlayerView.setPlayer(exoPlayer);
+        MediaItem mediaItem = MediaItem.fromUri(Uri.parse(url));
+        exoPlayer.setMediaItem(mediaItem);
+        exoPlayer.prepare();
+        exoPlayer.play();
     }
 }
